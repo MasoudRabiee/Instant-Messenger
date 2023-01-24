@@ -7,7 +7,7 @@ import axios from "axios";
 import { sendMessageRoute, recieveMessageRoute, checkMessageRoute } from "../utils/APIRoutes";
 import PAvatar from "../assets/Avatar.png";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import "react-toastify/dist/ReactToastify.css";
 
 export default function ChatContainer({ currentChat, socket }) {
   const [messages, setMessages] = useState([]);

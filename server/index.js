@@ -6,12 +6,17 @@ const messageRoutes = require("./routes/messages");
 // antispam and socket io :
 const SocketAntiSpam = require('socket-anti-spam');
 const socket = require("socket.io");
+const badFilter = require("bad-words");
+const filter = new badFilter();
+
+filter.addWords("fuck");
 require("dotenv").config();
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
 
 // DataBase :
 mongoose
@@ -61,9 +66,27 @@ io.on("connection", (socket) => {
   socket.on("send-msg", (data) => {
     const sendUserSocket = onlineUsers.get(data.to);
     if (sendUserSocket) {
-      socket.to(sendUserSocket).emit("msg-recieve", data.msg);
+      if(filter.isProfane(data.msg.toString())){
+        console.log(data.msg)
+      }
+      else{
+        socket.to(sendUserSocket).emit("msg-recieve", data.msg);
+      }
     }
   });
+
+  socket.on("badword", (data) => {
+    const sendUserSocket = onlineUsers.get(data.to);
+    if (sendUserSocket) {
+      if(filter.isProfane(data.msg.toString())){
+        data.msg = "***";
+      }
+      else{
+        socket.to(sendUserSocket).emit("isbadword", data.msg);
+      }
+    }
+  });
+
 });
 
 socketAntiSpam.event.on('ban', (socket, data) => {
